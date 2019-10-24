@@ -176,6 +176,33 @@ class Solution3 implements ISolution {
     }
 }
 
+class Solution3_2 implements ISolution {
+    @Override
+    public int trap(int[] height) {
+        int left = 0, right = height.length - 1;
+        int max_left = 0, max_right = 0;
+        int ans = 0;
+        while (left < right) {
+            if (height[left] < height[right]) {
+                if (height[left] >= max_left) {
+                    max_left = height[left];
+                } else {
+                    ans += max_left - height[left];
+                }
+                left++;
+            } else {
+                if (height[right] >= max_right) {
+                    max_right = height[right];
+                } else {
+                    ans += max_right - height[right];
+                }
+                right--;
+            }
+        }
+        return ans;
+    }
+}
+
 /**
  * 栈
  * 类似俄罗斯方块那样由下向上一层一层，填充，铺满就出栈了。
