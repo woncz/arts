@@ -31,6 +31,16 @@ public class Main {
 
         ans = s2.findMin(new int[] {4,5,6,7,0,1,2});
         System.out.println(ans);
+
+        ISolution s3 = new Solution3();
+        ans = s3.findMin(new int[] {3,4,5,1,2});
+        System.out.println(ans);
+
+        ans = s3.findMin(new int[] {4,5,6,7,0,1,2});
+        System.out.println(ans);
+
+        ans = s3.findMin(new int[] {3, 1, 2});
+        System.out.println(ans);
     }
 }
 
@@ -61,6 +71,22 @@ class Solution1 implements ISolution {
             }
         }
         return Integer.MIN_VALUE;
+    }
+}
+
+/**
+ * 二分法 更优
+ */
+class Solution3 implements ISolution {
+    @Override
+    public int findMin(int[] nums) {
+        int left = 0, right = nums.length - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] > nums[right]) left = mid + 1;
+            else right = mid;
+        }
+        return nums[left];
     }
 }
 
