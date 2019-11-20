@@ -49,30 +49,28 @@ class Trie {
     public boolean search(String word) {
         char[] letters = word.toCharArray();
         TrieNode node = root;
-        int step = 0;
         for (char c : letters) {
             int index = c - 'a';
-            if (node.getChildren()[index] != null) {
-                node = node.getChildren()[index];
-                step++;
+            if (node.getChildren()[index] == null) {
+                return false;
             }
+            node = node.getChildren()[index];
         }
-        return step == letters.length && node.isWord();
+        return node.isWord();
     }
 
     /** Returns if there is any word in the trie that starts with the given prefix. */
     public boolean startsWith(String prefix) {
         char[] letters = prefix.toCharArray();
         TrieNode node = root;
-        int step = 0;
         for (char c : letters) {
             int index = c - 'a';
-            if (node.getChildren()[index] != null) {
-                node = node.getChildren()[index];
-                step++;
+            if (node.getChildren()[index] == null) {
+                return false;
             }
+            node = node.getChildren()[index];
         }
-        return step == letters.length;
+        return true;
     }
 
     public static void main(String[] args) {
