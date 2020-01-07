@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package algo4;
+package algo4.week1;
 
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;

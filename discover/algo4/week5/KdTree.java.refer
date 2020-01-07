@@ -1,0 +1,229 @@
+/*
+ * Copyright [2020]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package algo4.week5;
+
+import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.StdDraw;
+
+import java.util.ArrayList;
+
+public class KdTree {
+    private Node root;
+    private int n;
+
+    private static class Node {
+        private Point2D p;      // the point
+        private RectHV rect;    // the axis-aligned rectangle corresponding to this node
+        private Node lb;        // the left/bottom subtree
+        private Node rt;        // the right/top subtree
+
+        public Node(Point2D p, RectHV rect) {
+            this.p = p;
+            this.rect = rect;
+        }
+    }
+
+    public KdTree()                               // construct an empty set of points
+    {
+        root = null;
+        n = 0;
+    }
+
+    public boolean isEmpty()                      // is the set empty?
+    {
+        return root == null;
+    }
+
+    public int size()                         // number of points in the set
+    {
+        return n;
+    }
+
+    public void insert(
+            Point2D p)              // add the point to the set (if it is not already in the set)
+    {
+        if (p == null)
+            throw new IllegalArgumentException("Point is null");
+        if (root == null) {
+            root = new Node(p, new RectHV(0, 0, 1, 1));
+            n++;
+        }
+        else {
+            insert(root, p, false);
+            n++;
+        }
+    }
+
+    private void insert(Node x, Point2D p, boolean flag) {
+        if (x.p.equals(p))
+        {
+            n--;
+            return;
+        }
+        double cmp;
+        if (!flag)
+            cmp = p.x() - x.p.x();
+        else
+            cmp = p.y() - x.p.y();
+
+        if (cmp < 0) {
+            if (x.lb != null)
+                insert(x.lb, p, !flag);
+            else {
+                if (flag) {
+                    x.lb = new Node(p, new RectHV(x.rect.xmin(), x.rect.ymin(), x.rect.xmax(),
+                            x.p.y()));
+                }
+                else {
+                    x.lb = new Node(p, new RectHV(x.rect.xmin(), x.rect.ymin(), x.p.x(),
+                            x.rect.ymax()));
+                }
+            }
+        }
+        else if (cmp >= 0) {
+            if (x.rt != null)
+                insert(x.rt, p, !flag);
+            else {
+                if (flag) {
+                    x.rt = new Node(p, new RectHV(x.rect.xmin(), x.p.y(), x.rect.xmax(),
+                            x.rect.ymax()));
+                }
+                else {
+                    x.rt = new Node(p, new RectHV(x.p.x(), x.rect.ymin(), x.rect.xmax(),
+                            x.rect.ymax()));
+                }
+            }
+        }
+    }
+
+    public boolean contains(Point2D p)            // does the set contain point p?
+    {
+        if (p == null)
+            throw new IllegalArgumentException("Point is null");
+        return find(root, p, true);
+
+    }
+
+    private boolean find(Node x, Point2D p, boolean flag) {
+        if (x == null)
+            return false;
+        if (x.p.equals(p))
+            return true;
+        double cmp;
+        if (flag)
+            cmp = Double.compare(p.x(), x.p.x());
+        else
+            cmp = Double.compare(p.y(), x.p.y());
+        if (cmp < 0)
+            return find(x.lb, p, !flag);
+        else
+            return find(x.rt, p, !flag);
+    }
+
+    public void draw()                         // draw all points to standard draw
+    {
+        StdDraw.setXscale(0, 1);
+        StdDraw.setYscale(0, 1);
+        StdDraw.setPenRadius(0.01);
+        draw(root, true);
+    }
+
+    private void draw(Node x, boolean flag) {
+        if (x == null)
+            return;
+        if (flag) {
+            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.line(x.p.x(), x.rect.ymin(), x.p.x(), x.rect.ymax());
+            StdDraw.setPenColor(StdDraw.BLACK);
+            StdDraw.point(x.p.x(), x.p.y());
+        }
+        else {
+            StdDraw.setPenColor(StdDraw.BLUE);
+            StdDraw.line(x.rect.xmin(), x.p.y(), x.rect.xmax(), x.p.y());
+            StdDraw.setPenColor(StdDraw.BLACK);
+            StdDraw.point(x.p.x(), x.p.y());
+        }
+        draw(x.lb, !flag);
+        draw(x.rt, !flag);
+    }
+
+    public Iterable<Point2D> range(
+            RectHV rect)             // all points that are inside the rectangle (or on the boundary)
+    {
+        if (rect == null)
+            throw new IllegalArgumentException("Rect is null");
+        ArrayList<Point2D> list = new ArrayList<>();
+        if (root != null)
+            list.addAll(range(root, rect));
+        return list;
+    }
+
+    private  ArrayList<Point2D> range(Node x, RectHV rect)
+    {
+        ArrayList<Point2D> list = new ArrayList<>();
+        if (x.rect.intersects(rect)) {
+            if (rect.contains(x.p))
+                list.add(x.p);
+            if (x.lb != null) {
+                list.addAll(range(x.lb, rect));
+            }
+            if (x.rt != null) {
+                list.addAll(range(x.rt, rect));
+            }
+        }
+        return list;
+    }
+
+    public Point2D nearest(
+            Point2D p)             // a nearest neighbor in the set to point p; null if the set is empty
+    {
+        if (p == null)
+            throw new IllegalArgumentException("Point is null");
+        if (root == null)
+            return null;
+        return nearest(root, p, root.p, true);
+    }
+
+    private Point2D nearest(Node x, Point2D p, Point2D closest, boolean flag)
+    {
+        double min = closest.distanceSquaredTo(p);
+        if (x == null || Double.compare(x.rect.distanceSquaredTo(p), min) >= 0)
+            return closest;
+        double distance = x.p.distanceSquaredTo(p);
+        if (Double.compare(distance, min) == -1) {
+            closest = x.p;
+        }
+        if ((flag && Double.compare(p.x(), x.p.x()) < 0) || (!flag && Double.compare(p.y(), x.p.y()) < 0))
+        {
+            closest = nearest(x.lb, p, closest, !flag);
+            closest = nearest(x.rt, p, closest, !flag);
+        }
+        else
+        {
+            closest = nearest(x.rt, p, closest, !flag);
+            closest = nearest(x.lb, p, closest, !flag);
+        }
+        return closest;
+    }
+
+    public static void main(
+            String[] args)                  // unit testing of the methods (optional)
+    {
+
+    }
+}
