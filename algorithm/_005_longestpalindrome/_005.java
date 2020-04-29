@@ -49,7 +49,16 @@ public class _005 {
     }
 }
 
-class Solution {
+interface ISolution {
+    String longestPalindrome(String s);
+}
+
+/**
+ * 选中一个pivot, 判断是否基于pivot轴对称
+ * time complexity : O(N^2)
+ */
+class Solution implements ISolution {
+    @Override
     public String longestPalindrome(String s) {
         int max = 0;
         int cut = s.length() * 2 + 1;
@@ -60,7 +69,7 @@ class Solution {
             String tmp = "";
             int side = mid / 2;
             int len = 0;
-            // even
+            // even (mid points to a character not a gap)
             if (mid % 2 == 0) {
                 len = 1;
                 for (int i = 0; i < side; i++) {
@@ -111,5 +120,47 @@ class Solution {
             }
         }
         return r;
+    }
+}
+
+/**
+ * DP
+ */
+class Solution2 implements ISolution {
+    @Override
+    public String longestPalindrome(String s) {
+        if (s == null || s.length() == 0) return s;
+
+        int N = s.length();
+        int max = 1;
+        int left = 0;
+        boolean[][] dp = new boolean[N][N];
+
+        for (int i = 1; i < N; i++) {
+            for (int j = 0; j < i; j++) {
+                if (s.charAt(i) == s.charAt(j)) {
+                    if (dp[i - 1][j + 1] || i - j <= 2) {
+                        dp[i][j] = true;
+                        if (i - j + 1 > max) {
+                            left = j;
+                            max = i - j + 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        return s.substring(left, left + max);
+    }
+
+    public static void main(String[] args) {
+        String s = "cbbd";
+        ISolution ss = new Solution2();
+        String ans = ss.longestPalindrome(s);
+        System.out.println(ans);
+
+        s = "babad";
+        ans = ss.longestPalindrome(s);
+        System.out.println(ans);
     }
 }

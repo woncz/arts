@@ -39,8 +39,32 @@ interface ISolution {
 class Solution1 implements ISolution {
     @Override
     public int ladderLength(String beginWord, String endWord, List<String> wordList) {
-        // TODO
+        Set<String> alternative = new HashSet<>(wordList);
+        Queue<String> queue = new ArrayDeque<>();
+        queue.offer(beginWord);
+        int step = 1;
+        while(!queue.isEmpty()) {
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                String current = queue.poll();
+                for (int j = 0; j < current.length(); j++) {
+                    StringBuilder sb = new StringBuilder(current);
+                    for (char c = 'a'; c <= 'z'; c++) {
+                        sb.setCharAt(j, c);
+                        String newWord = sb.toString();
+                        if (alternative.contains(newWord)) {
+                            if (newWord.equals(endWord)) return step + 1;
+                            alternative.remove(newWord);
+                            queue.offer(newWord);
+                        }
+                    }
+                }
+            }
+            step++;
+        }
+
         return 0;
+
     }
 }
 
@@ -82,6 +106,10 @@ class Solution2 implements ISolution {
 
         ISolution s = new Solution2();
         int step = s.ladderLength(beginWord, endWord, wordList);
+        System.out.println(step);
+
+        ISolution s1 = new Solution1();
+        step = s1.ladderLength(beginWord, endWord, wordList);
         System.out.println(step);
 
     }

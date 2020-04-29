@@ -32,7 +32,12 @@ public class _008 {
     }
 }
 
-class Solution {
+interface ISolution {
+    int myAtoi(String str);
+}
+
+class Solution implements ISolution {
+    @Override
     public int myAtoi(String str) {
         if (str == null || str.length() == 0) {
             return 0;
@@ -76,5 +81,37 @@ class Solution {
             return true;
         }
         return false;
+    }
+}
+
+class Solution2 implements ISolution {
+    @Override
+    public int myAtoi(String str) {
+        int index = 0, sign = 1, total = 0;
+        // 1. empty string
+        if (str == null || str.length() == 0 || str.trim().length() == 0) return 0;
+
+        // 2. remove space
+        while (index < str.length() && str.charAt(index) == ' ')
+            index++;
+
+        // 3. handle sign
+        if (str.charAt(index) == '-' || str.charAt(index) == '+') {
+            sign = str.charAt(index) == '+' ? 1 : -1;
+            index++;
+        }
+
+        // 4. convert number
+        while (index < str.length()) {
+            int digit = str.charAt(index) - '0';
+            if (digit < 0 || digit > 9) break;
+            //check if total will be overflow after 10 times and add digit
+            if(Integer.MAX_VALUE / 10 < total ||
+                    Integer.MAX_VALUE / 10 == total && Integer.MAX_VALUE % 10 < digit)
+                return sign == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+            total = total * 10 + digit;
+            index++;
+        }
+        return total * sign;
     }
 }
