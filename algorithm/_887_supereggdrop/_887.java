@@ -119,7 +119,9 @@ class Solution3 implements ISolution {
         return dp(K, N);
     }
 
+    // 备忘录，缓存结果提高计算效率，空间换时间
     Map<String, Integer> memo = new HashMap<>();
+
     int dp(int k, int n) {
         // terminator
         String key = k + ":" + n;
