@@ -16,7 +16,7 @@
 
 package _547_friendcircles;
 
-public class _547 {
+public class  _547 {
     public static void main(String[] args) {
         int[][] M = new int[][] {{1,1,0},{1,1,0},{0,0,1}};
         ISolution s1 = new Solution1();
@@ -46,19 +46,14 @@ class Solution1 implements ISolution {
 
         final int X = M.length;
         final int Y = M[0].length;
-        UnionFind uf = new UnionFind(X * Y, M);
+        final int N = M.length;
+        UnionFind uf = new UnionFind(N, M);
 
-        int[] dx = new int[] {-1, 1, 0, 0};
-        int[] dy = new int[] {0, 0, -1, 1};
         for (int x = 0; x < X; x++ ) {
-            for (int y = 0; y <= x; y++) {
+            for (int y = x; y < Y; y++) {
                 if (M[x][y] == 1) {
-                    for (int i = 0; i < 4; i++) {
-                        int nx = x + dx[i];
-                        int ny = y + dy[i];
-                        if (isValid(M, nx, ny)) {
-                            uf.union(x * X + y, nx * X + ny);
-                        }
+                    if (!uf.connected(x, y)) {
+                        uf.union(x, y);
                     }
                 }
             }
@@ -67,9 +62,6 @@ class Solution1 implements ISolution {
         return uf.count();
     }
 
-    boolean isValid(int[][] M, int x, int y) {
-        return (x >= 0 && x < M.length && y >= 0 && y < M[0].length && M[x][y] == 1);
-    }
 }
 
 /**
@@ -106,14 +98,10 @@ class UnionFind {
         parent = new int[n];
         size = new int[n];
         for (int i = 0; i < n; i++) {
-            if (M[i / M.length][i % M[0].length] == 1) {
-                parent[i] = i;
-                size[i] = 1;
-            } else {
-                count--;
-            }
+            parent[i] = i;
+            size[i] = 1;
         }
-    }
+     }
 
     /**
      * 在p和q之间添加一条连接
