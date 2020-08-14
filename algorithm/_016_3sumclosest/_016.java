@@ -16,18 +16,18 @@
 
 package _016_3sumclosest;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by woncz on 8/13/2020.
  */
 public class _016 {
     public static void main(String[] args) {
+        int[] nums = new int[] {-1,2,1,-4};
+        int target = 1;
 
+        ISolution solution = new Solution();
+        System.out.println(solution.threeSumClosest(nums, target));
     }
 }
 
@@ -42,9 +42,13 @@ class Solution implements ISolution {
 
         Arrays.sort(nums);
 
+        // default answer
         int closestNum = nums[0] + nums[1] + nums[2];
+
+        // two pointer left and right
         for (int i = 0; i < nums.length - 2; i++) {
             int l = i + 1, r = nums.length - 1;
+            // terminate condition
             while (l < r) {
                 int threeSum = nums[i] + nums[l] + nums[r];
                 if (Math.abs(threeSum - target) < Math.abs(closestNum - target)) {
