@@ -40,16 +40,15 @@ class Solution {
         }
         int[] cache = new int[26];
         for(char c : s.toCharArray()) {
-            cache[(int)(c - 'a')]++;
+            cache[(c - 'a')]++;
         }
         for (char c : t.toCharArray()) {
-            cache[(int)(c - 'a')]--;
+            cache[(c - 'a')]--;
         }
         for (int i = 0; i < cache.length; i++) {
             if (cache[i] != 0) return false;
         }
         return true;
-
     }
 }
 
