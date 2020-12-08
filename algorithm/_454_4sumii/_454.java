@@ -136,6 +136,9 @@ class Solution2 implements ISolution {
     }
 }
 
+/**
+ * 通过合并处理降低复杂度，N^4 -> N^2
+ */
 class Solution3 implements ISolution {
     @Override
     public int fourSumCount(int[] A, int[] B, int[] C, int[] D) {
