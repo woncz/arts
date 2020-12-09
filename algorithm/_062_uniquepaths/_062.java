@@ -18,7 +18,12 @@ package _062_uniquepaths;
 
 public class _062 {
     public static void main(String[] args) {
+        int m = 3, n = 2;
+        ISolution solution = new Solution2();
+        System.out.println(solution.uniquePaths(m, n));
 
+        m = 3; n = 7;
+        System.out.println(solution.uniquePaths(m, n));
     }
 }
 
@@ -45,6 +50,30 @@ class Solution implements ISolution {
         }
 
         return state[0][0];
+    }
+}
+
+class Solution2 implements ISolution {
+    @Override
+    public int uniquePaths(int m, int n) {
+        if (m == 0 || n == 0) {
+            return 0;
+        }
+        if (m == 1 || n == 1) {
+            return 1;
+        }
+        int[] dp = new int[n];
+        for(int i = 0; i < n; i++) {
+            dp[i] = 1;
+        }
+
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[j] += dp[j - 1];
+            }
+        }
+
+        return dp[n - 1];
     }
 }
 
