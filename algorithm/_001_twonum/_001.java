@@ -1,5 +1,6 @@
 package _001_twonum;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ public class _001 {
         Solution s = new Solution();
         int[] nums = new int[] {3,2,4};
         int target = 6;
-        System.out.println(s.twoSum(nums, target));
+        System.out.println(Arrays.toString(s.twoSum(nums, target)));
     }
 }
 
