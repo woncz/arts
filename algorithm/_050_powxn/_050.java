@@ -124,8 +124,7 @@ class Solution4 implements ISolution {
 class Solution5 implements ISolution {
     @Override
     public double myPow(double x, int n) {
-        long N = n;
-        return N > 0? quickMul(x, N) : 1.0 / quickMul(x, -N);
+        return (long) n > 0? quickMul(x, n) : 1.0 / quickMul(x, -(long) n);
     }
 
     /**

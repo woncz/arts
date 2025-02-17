@@ -88,10 +88,7 @@ class Solution2 implements ISolution {
     @Override
     public int divide(int dividend, int divisor) {
         long a = dividend, b = divisor;
-        boolean neg = false;
-        if ((a < 0 && b > 0) || (a > 0 && b < 0)) {
-            neg = true;
-        }
+        boolean neg = (a < 0 && b > 0) || (a > 0 && b < 0);
         if (a < 0) a = -a;
         if (b < 0) b = -b;
         long l = 0, r = a;
