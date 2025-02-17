@@ -83,6 +83,8 @@ class Solution2 implements ISolution {
         }
         // drill down
         double res = pow(x, n / 2);
+
+        // n & 1 等价于 n % 2 == 1
         return (n & 1) == 1 ? res * res * x : res * res;
     }
 }
@@ -96,5 +98,48 @@ class Solution3 implements ISolution {
         }
         double res = myPow(x, n >>> 1);
         return (n & 1) == 1 ? res * res * x : res * res;
+    }
+}
+
+class Solution4 implements ISolution {
+    @Override
+    public double myPow(double x, int n) {
+        long N = n;
+        return N > 0 ? quickMul(x, N) : 1.0 / quickMul(x, -N);
+    }
+
+    /**
+     * 快速乘法 quick multiply (递归)
+     */
+    private double quickMul(double x, long n) {
+        if (n == 0) {
+            return 1.0;
+        }
+        double ans = quickMul(x, n / 2);
+        //return n % 2 == 0? ans * ans : ans * ans * x;
+        return (n & 1) == 0 ? ans * ans : ans * ans * x ;
+    }
+}
+
+class Solution5 implements ISolution {
+    @Override
+    public double myPow(double x, int n) {
+        long N = n;
+        return N > 0? quickMul(x, N) : 1.0 / quickMul(x, -N);
+    }
+
+    /**
+     * 快速乘法 quick multiply (迭代)
+     */
+    private double quickMul(double x, long N) {
+        double ans = 1.0;
+        while (N > 0) {
+            if ((N & 1) == 1) {
+                ans *= x;
+            }
+            x *= x;
+            N >>= 1;
+        }
+        return ans;
     }
 }
