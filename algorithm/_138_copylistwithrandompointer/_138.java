@@ -36,7 +36,7 @@ public class _138 {
 
         n2.random = n2;
 
-        ISolution solution = new Solution();
+        ISolution solution = new Solution4();
         Node nn = solution.copyRandomList(n1);
         System.out.println(nn);
     }
@@ -171,6 +171,58 @@ class Solution3 implements ISolution {
 
              p = p.next;
              q = q.next;
+        }
+
+        return ans;
+    }
+}
+
+class Solution4 implements ISolution {
+    @Override
+    public Node copyRandomList(Node head) {
+        Map<Node, Integer> i1 = new HashMap<>();
+        Map<Integer, Node> i2 = new HashMap<>();
+
+        // 0. defence coding
+        if (head == null) return null;
+
+        // 1. deep copy
+        Node h1 = head, h2 = null, ans = null;
+        int i = 0;
+        while (h1 != null) {
+            // build
+            Node n = new Node(h1.val);
+            if (ans == null) {
+                ans = n;
+            }
+
+            // cache
+            i1.put(h1, i);
+            i2.put(i, n);
+            i++;
+
+            // next step
+            if (h2 == null) {
+                h2 = n;
+            } else {
+                h2.next = n;
+                h2 = h2.next;
+            }
+
+            h1 = h1.next;
+        }
+
+        // 2. set random pointer
+        h1 = head;
+        h2 = ans;
+        while (h1 != null) {
+            Integer idx = i1.get(h1.random);
+            if (idx != null) {
+                h2.random = i2.get(idx);
+            }
+
+            h1 = h1.next;
+            h2 = h2.next;
         }
 
         return ans;
