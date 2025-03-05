@@ -63,8 +63,10 @@ interface ISolution {
 class Solution implements ISolution {
     @Override
     public ListNode sortList(ListNode head) {
+        // 0. defence coding
         if (head == null || head.next == null) return head;
 
+        // 1. find the middle node and divide the list into two parts
         ListNode pre = null, slow = head, fast = head;
         while (fast != null && fast.next != null) {
             pre = slow;
@@ -74,32 +76,65 @@ class Solution implements ISolution {
         // unlink
         pre.next = null;
 
-        ListNode l1 = sortList(head);
-        ListNode l2 = sortList(slow);
+        // 2. sort each part
+        ListNode l = sortList(head);
+        ListNode r = sortList(slow);
 
-        return merge(l1, l2);
+        // 3. merge l and r
+        return merge(l, r);
     }
 
-    ListNode merge(ListNode l1, ListNode l2) {
-        ListNode l = new ListNode(0), p = l;
-        while (l1 != null && l2 != null) {
-            if (l1.val < l2.val) {
-                p.next = l1;
-                l1 = l1.next;
+    ListNode merge(ListNode l, ListNode r) {
+        ListNode dummy = new ListNode(0), p = dummy;
+        while (l != null && r != null) {
+            if (l.val < r.val) {
+                p.next = l;
+                l = l.next;
             } else {
-                p.next = l2;
-                l2 = l2.next;
+                p.next = r;
+                r = r.next;
             }
-            // go to last
+            // forward
             p = p.next;
         }
 
-        if (l1 != null) {
-            p.next = l1;
+        if (l != null) {
+            p.next = l;
         }
-        if (l2 != null) {
-            p.next = l2;
+        if (r != null) {
+            p.next = r;
         }
-        return l.next;
+        return dummy.next;
+    }
+}
+
+/**
+ * timeout O(N^2)
+ */
+class Solution2 implements ISolution {
+    public ListNode sortList(ListNode head) {
+        if (head == null || head.next == null) return head;
+        ListNode dummy = new ListNode(Integer.MIN_VALUE);
+        for (ListNode p = head; p != null;) {
+            ListNode q = p.next;
+            p.next = null;
+            sort(dummy, p);
+            p = q;
+        }
+        return dummy.next;
+    }
+
+    void sort(ListNode h, ListNode p) {
+        ListNode l = h, r = l.next;
+        while (r != null && r.val < p.val) {
+            r = r.next;
+            l = l.next;
+        }
+        if (l.next == null) {
+            l.next = p;
+        } else {
+            p.next = l.next;
+            l.next = p;
+        }
     }
 }
