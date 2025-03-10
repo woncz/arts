@@ -48,6 +48,23 @@ public class _078 {
         for (List<Integer> r : ret) {
             System.out.println(r);
         }
+
+        System.out.println("Solution4:");
+        solution = new Solution4();
+        ret = solution.subsets(nums);
+        for (List<Integer> r : ret) {
+            System.out.println(r);
+        }
+
+        System.out.println("Solution5:");
+        solution = new Solution5();
+        ret = solution.subsets(nums);
+        for (List<Integer> r : ret) {
+            System.out.println(r);
+        }
+
+        int n = 4;
+        System.out.println(1 << n);
     }
 }
 
@@ -133,5 +150,59 @@ class Solution3 implements ISolution {
         this._process(nums, cnt + 1);
         selected.remove(selected.size() - 1);
         this._process(nums, cnt + 1);
+    }
+}
+
+/**
+ * 从输入的视角 -> 灵茶山艾府
+ */
+class Solution4 implements ISolution {
+    private List<List<Integer>> ans = new ArrayList<>();
+    private List<Integer> path = new ArrayList<>();
+    private int[] nums;
+
+    @Override
+    public List<List<Integer>> subsets(int[] nums) {
+        this.nums = nums;
+        dfs(0);
+        return ans;
+    }
+
+    void dfs(int i) {
+        // terminator
+        if (i == nums.length) {
+            ans.add(new ArrayList<>(path));
+            return;
+        }
+
+        //drill down
+        dfs(i + 1); // not select
+
+        path.add(nums[i]); // select
+        dfs(i + 1);
+        path.remove(path.size() - 1); // recover
+    }
+}
+
+// 从答案的视角 -> 灵茶山艾府
+class Solution5 implements ISolution {
+    private List<List<Integer>> ans = new ArrayList<>();
+    private List<Integer> path = new ArrayList<>();
+    private int[] nums;
+
+    @Override
+    public List<List<Integer>> subsets(int[] nums) {
+        this.nums = nums;
+        dfs(0);
+        return ans;
+    }
+
+    void dfs(int i) {
+        ans.add(new ArrayList<>(path));
+        for (int j = i; j < nums.length; j++) {
+            path.add(nums[j]);
+            dfs(j + 1);
+            path.remove(path.size() - 1);
+        }
     }
 }
