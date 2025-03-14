@@ -16,6 +16,7 @@
 
 package _077_combinations;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,8 +27,16 @@ public class _077 {
     public static void main(String[] args) {
         int n = 10, k = 3;
         ISolution solution = new Solution();
-        System.out.println(solution.combine(n, k));
-        System.out.println(solution.combine(n, k).size());
+        List<List<Integer>> ans = null;
+        ans = solution.combine(n, k);
+        System.out.println(ans);
+        System.out.println(ans.size());
+
+        solution = new Solution4();
+        ans = solution.combine(n, k);
+        System.out.println(ans);
+        System.out.println(ans.size());
+
     }
 }
 
@@ -67,5 +76,97 @@ class Solution implements ISolution {
         selected.remove(selected.size() - 1);
 
         this._process(n + 1, selected);
+    }
+}
+
+// answer-view
+class Solution2 implements ISolution {
+    List<List<Integer>> ans = new LinkedList<>();
+    List<Integer> path = new ArrayList<>();
+    int k = 0;
+
+    @Override
+    public List<List<Integer>> combine(int n, int k) {
+        this. k = k;
+        dfs(n);
+        return ans;
+    }
+
+    void dfs(int n) {
+        if (path.size() == k) {
+            ans.add(new ArrayList<>(path));
+            return;
+        }
+
+        for (int j = n; j > 0; j--) {
+            path.add(j);
+            dfs(j - 1);
+            path.remove(path.size() - 1);;
+        }
+    }
+}
+
+// answer-view with pruning
+class Solution3 implements ISolution {
+    List<List<Integer>> ans = new LinkedList<>();
+    List<Integer> path = new ArrayList<>();
+    int k = 0;
+
+    @Override
+    public List<List<Integer>> combine(int n, int k) {
+        this. k = k;
+        dfs(n);
+        return ans;
+    }
+
+    void dfs(int n) {
+        int d = k - path.size();
+        if (d == 0) {
+            ans.add(new ArrayList<>(path));
+            return;
+        }
+
+        for (int j = n; j >= d; j--) {
+            path.add(j);
+            dfs(j - 1);
+            path.remove(path.size() - 1);;
+        }
+    }
+}
+
+// input-view
+class Solution4 implements ISolution {
+    List<List<Integer>> ans = new LinkedList<>();
+    List<Integer> path = new ArrayList<>();
+    int n = 0;
+    int k = 0;
+
+    @Override
+    public List<List<Integer>> combine(int n, int k) {
+        this.n = n;
+        this.k = k;
+        dfs(1);
+        return ans;
+    }
+
+    void dfs(int i) {
+        int need = k - path.size();
+        if (need == 0) {
+            ans.add(new ArrayList<>(path));
+            return;
+        }
+
+        // pruning
+        if (i > n || n - i + 1 < need) {
+            return;
+        }
+
+        // not select
+        dfs(i + 1);
+
+        // select
+        path.add(i);
+        dfs(i + 1);
+        path.remove(path.size() - 1);
     }
 }
