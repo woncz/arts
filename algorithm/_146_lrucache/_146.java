@@ -17,6 +17,7 @@
 package _146_lrucache;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class _146 {
@@ -48,23 +49,6 @@ class LRUCache {
 
     private int size = 0;
 
-    class Node {
-        private int key;
-        private int value;
-        private Node previous;
-        private Node next;
-
-        public Node(int key, int value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        @Override
-        public int hashCode() {
-            return this.key;
-        }
-    }
-
     private Map<Integer, Node> bucket;
 
     private Node head;
@@ -84,13 +68,13 @@ class LRUCache {
             }
             if (head == current) {
                 head = current.next;
-                head.previous = null;
+                head.prev = null;
             } else {
-                current.previous.next = current.next;
-                current.next.previous = current.previous;
+                current.prev.next = current.next;
+                current.next.prev = current.prev;
             }
             tail.next = current;
-            current.previous = tail;
+            current.prev = tail;
             tail = current;
             tail.next = null;
             return current.value;
@@ -99,6 +83,7 @@ class LRUCache {
     }
 
     public void put(int key, int value) {
+        // put时同样更新位置(通过调用get()方法)(refer:LinkedHashMap#accessOrder = true/false)
         if (this.get(key) != -1) {
             Node current = bucket.get(key);
             current.value = value;
@@ -112,7 +97,7 @@ class LRUCache {
                 tail = current;
             } else {
                 tail.next = current;
-                current.previous = tail;
+                current.prev = tail;
                 tail = current;
             }
             size++;
@@ -124,12 +109,12 @@ class LRUCache {
                 tail = current;
             } else {
                 // delete first
-                second.previous = null;
+                second.prev = null;
                 head.next = null;
                 head = second;
                 // add to tail
                 tail.next = current;
-                current.previous = tail;
+                current.prev = tail;
                 tail = current;
             }
         }
@@ -142,5 +127,214 @@ class LRUCache {
  * int param_1 = obj.get(key);
  * obj.put(key,value);
  */
+class Node {
+    public int key, value;
+    public Node prev, next;
+    public Node(int k, int v) {
+        this.key = k;
+        this.value = v;
+    }
+}
+
+class DoubleList {
+    private Node head, tail;
+
+    private int size;
+
+    // 头尾两节点为哨兵节点
+    public DoubleList() {
+        head = new Node(0, 0);
+        tail = new Node(0, 0 );
+        head.next = tail;
+        tail.prev = head;
+        size = 0;
+    }
+
+    public void addLast(Node x) {
+        x.prev = tail.prev;
+        x.next = tail;
+        tail.prev.next = x;
+        tail.prev = x;
+        size++;
+    }
+
+    // 节点x的prev和next是否需要处理？
+    public void remove(Node x) {
+        x.prev.next = x.next;
+        x.next.prev = x.prev;
+        size--;
+    }
+
+    public Node removeFirst() {
+        // 空集时
+        if (head.next == tail) {
+            return null;
+        }
+        Node first = head.next;
+        remove(first);
+        return first;
+    }
+
+    public int size() {
+        return size;
+    }
+}
+
+/**
+ * 哈希表 + 双向链表
+ */
+class LRUCache2 {
+    private HashMap<Integer, Node> bucket;
+
+    private DoubleList cache;
+
+    private int cap;
+
+    public LRUCache2(int capacity) {
+        this.cap = capacity;
+        bucket = new HashMap<>(capacity);
+        cache = new DoubleList();
+    }
+
+    private void makeRecently(int key) {
+        Node x = bucket.get(key);
+        cache.remove(x);
+        cache.addLast(x);
+    }
+
+    private void addRecently(int key, int val) {
+        Node x = new Node(key, val);
+        cache.addLast(x);
+        bucket.put(key, x);
+    }
+
+    private void deleteKey(int key) {
+        Node x = bucket.get(key);
+        cache.remove(x);
+        bucket.remove(key);
+    }
+
+    private void removeLeastRecently() {
+        Node deletedNode = cache.removeFirst();
+        int deletedKey = deletedNode.key;
+        bucket.remove(deletedKey);
+    }
+
+    public int get(int key) {
+        if (!bucket.containsKey(key)) {
+            return -1;
+        }
+        makeRecently(key);
+        return bucket.get(key).value;
+    }
+
+    public void put(int key, int value) {
+        if (bucket.containsKey(key)) {
+            deleteKey(key);
+            addRecently(key, value);
+            return;
+        }
+        if (cap == cache.size()) {
+            removeLeastRecently();
+        }
+        addRecently(key, value);
+    }
+}
+
+class LRUCache3 {
+
+    private int cap;
+
+    private Map<Integer, Integer> cache = new LinkedHashMap<>();
+
+    public LRUCache3(int cap) {
+        this.cap = cap;
+    }
+
+    public int get(int key) {
+        if (!cache.containsKey(key)) {
+            return -1;
+        }
+        makeRecently(key);
+        return cache.get(key);
+    }
+
+    public void put(int key, int val) {
+        if (cache.containsKey(key)) {
+            cache.put(key, val);
+            makeRecently(key);
+            return;
+        }
+        if (cache.size() >= this.cap) {
+            int eldestKey = cache.keySet().iterator().next();
+            cache.remove(eldestKey);
+        }
+        cache.put(key, val);
+    }
+
+    private void makeRecently(int key) {
+        int val = cache.get(key);
+        cache.remove(key);
+        cache.put(key, val);
+    }
+}
+
+class LRUCache4 {
+
+    private int cap;
+
+    private LinkedHashMap<Integer, Integer> bucket;
+
+    public LRUCache4(int cap) {
+        this.cap = cap;
+        this.bucket = new LinkedHashMap<>(cap, 0.75f, true);
+    }
+
+    public int get(int key) {
+        if (!bucket.containsKey(key)) {
+            return -1;
+        }
+        return bucket.get(key);
+    }
+
+    public void put(int key, int val) {
+        if (bucket.containsKey(key)) {
+            bucket.put(key, val);
+            return;
+        }
+        if (bucket.size() >= this.cap) {
+            int eldestKey = bucket.keySet().iterator().next();
+            bucket.remove(eldestKey);
+        }
+        bucket.put(key, val);
+    }
+}
+
+class LRUCache5 {
+
+    private int cap;
+
+    private final LinkedHashMap<Integer, Integer> bucket;
+
+    public LRUCache5(int cap) {
+        this.cap = cap;
+        bucket = new LinkedHashMap<>(cap, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
+                return size() > cap;
+            }
+        };
+    }
+
+    // Get the value associated with the key
+    public Integer get(int key) {
+        return bucket.getOrDefault(key, -1);
+    }
+
+    // Add a key-value pair to the cache
+    public void put(int key, int value) {
+        bucket.put(key, value);
+    }
+}
 
 
