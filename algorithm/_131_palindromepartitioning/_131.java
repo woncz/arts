@@ -1,7 +1,6 @@
 package _131_palindromepartitioning;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class _131 {
@@ -25,8 +24,8 @@ interface ISolution {
 // 回溯三问{当前操作->; 子问题-> ;下一层子问题->}
 // 注意：每个子串都是回文串
 class Solution implements ISolution {
-    private List<List<String>> ans = new ArrayList<>();
-    private List<String> path = new ArrayList<>();
+    private final List<List<String>> ans = new ArrayList<>();
+    private final List<String> path = new ArrayList<>();
     private String s = null;
 
     public List<List<String>> partition(String s) {
@@ -67,8 +66,8 @@ class Solution implements ISolution {
 }
 
 class Solution2 implements ISolution {
-    private List<List<String>> ans = new ArrayList<>();
-    private List<String> path = new ArrayList<>();
+    private final List<List<String>> ans = new ArrayList<>();
+    private final List<String> path = new ArrayList<>();
     private String s = null;
 
     @Override
